@@ -1,0 +1,385 @@
+<style>
+html, body { margin: 0; font-family: sans-serif; font-size: 18px; background: #222; color: #fff; line-height: 1.4; }
+ul { padding-left: 24px; }
+li { margin-bottom: 4px; }
+a { color: #f35c21; }
+pre { overflow-x: auto; padding: 8px; background: #333; border-radius: 8px; }
+code { display: inline-block; padding: 0 2px; background: #333; border-radius: 4px; }
+.sidebar { flex: 0 0 200px;padding-right: 16px; }
+.sidebar a { display: block; padding: 4px 0; }
+</style>
+<div style="max-width:800px;margin:0 auto;padding: 32px;">
+  <h1 style="margin: 0 0 32px;">
+    <img src="/favicon.ico" style="border-radius: 8px;vertical-align:middle;margin-right:12px;" width="48" />
+    Indexer Documentation
+  </h1>
+  <div style="display: flex;">
+  <div class="sidebar">
+    <a href="#overview">Overview</a>
+    <a href="#deployments">Deployments</a>
+    <a href="#endpoints">Endpoints</a>
+    <a href="#get/">GET /</a>
+    <a href="#get/runes">GET /runes</a>
+    <a href="#get/rune">GET /rune</a>
+    <a href="#get/balances">GET /balances</a>
+    <a href="#get/holders">GET /holders</a>
+    <a href="#get/transfers">GET /transfers</a>
+    <a href="#get/utxos">GET /utxos</a>
+    <a href="#get/transaction">GET /transaction</a>
+  </div>
+  <div style="flex: 1 1;min-width:0;">
+
+
+<h2 id="overview" style="margin-top:0;">Overview</h2>
+
+<p>
+This indexer is a fast, simple, secure implementation of the Runes meta-protocol rules/spec.
+An alternative implementation is good for the ambitions that this ecosystem has. 
+</p><p>
+Right now the indexer in it's current form is really aimed at serving the needs of
+applications and websites needing the data.
+</p><p>
+But in building this codebase in a cleanroom environment we are motivated by the prospect
+of evolving it into a decentralized set of participants, with 1-of-N trust assumptions
+suitable for the applications requiring the most security like marketplaces or wallets.
+</p><p>
+This will be achived by following the path outline in this wonderful paper by the fine people at NuBit: https://eprint.iacr.org/2024/408
+</p><p>
+We have all the Runes data, but the endpoints as still evolving as we uncover needs,
+we'd be happy to morph those into something that helps out your use case.
+</p>
+
+
+<h2 id="deployments">Deployments</h2>
+
+<ul>
+  <li>Mainnet: <a target="_blank" href="https://indexer.runemine.com/">https://indexer.runemine.com/</a></li>
+  <li>Testnet: <a target="_blank" href="https://indexer-testnet.runemine.com/">https://indexer-testnet.runemine.com/</a></li>
+</ul>
+
+
+<h2 id="endpoints">Endpoints</h2>
+
+<h3 id="get/"><a target="_blank" href="https://indexer-testnet.runemine.com/">GET /</a></h3>
+
+Returns the total number of runes and total number of transfers indexed.
+
+<pre>
+{
+  "runes": 6889,
+  "transfers": 2200955,
+  "runestones": 2730792,
+  "height": 2821179
+}
+</pre>
+
+<h3 id="get/runes"><a target="_blank" href="https://indexer-testnet.runemine.com/runes?limit=2&q=test">GET /runes</a></h3>
+
+Returns a list of runes top level details, optionally sorted, filtered and paginated.
+
+<ul>
+  <li><code>offset</code> Number of runes to skip (for pagination)</li>
+  <li><code>limit</code> Maximum number of runes to return</li>
+  <li><code>order</code> Can be "index", "slug", or "mints" (prepend of "-" for descending sort)</li>
+  <li><code>q</code> Filters runes by name, case insensitive, no spacers</li>
+</ul>
+
+<pre>
+{
+  "runes": [
+    {
+      "id": "2583756.37",
+      "tx": "5d00a3113b44cd837ab5498b96532ba619da66bf35e3059c89e6d38e503bf704",
+      "time": 1711507643,
+      "index": 7,
+      "cenotaph": "",
+      "slug": "testaaaaa",
+      "name": "TESTAAAAA",
+      "symbol": "T",
+      "divisibility": 0,
+      "turbo": false,
+      "premine": "1",
+      "mints": "0",
+      "amount": "0",
+      "cap": "0",
+      "start": 2583766,
+      "end": 2583766,
+      "heightStart": 0,
+      "heightEnd": 0,
+      "offsetStart": 90,
+      "offsetEnd": 10
+    },
+    {
+      "id": "2584333.39",
+      "tx": "2573fb505301bb4cfafff4f09cd5694efbf27e98b53befbdd43d12ad9232f945",
+      "time": 1711753002,
+      "index": 46,
+      "cenotaph": "",
+      "slug": "ineedtestrunes",
+      "name": "I•NEED•TEST•RUNES",
+      "symbol": "ᚱ",
+      "divisibility": 2,
+      "turbo": false,
+      "premine": "100000",
+      "mints": "92396",
+      "amount": "100000",
+      "cap": "20000000000000000",
+      "start": 2584333,
+      "end": 1000000000,
+      "heightStart": 0,
+      "heightEnd": 0,
+      "offsetStart": 0,
+      "offsetEnd": 0
+    }
+  ],
+  "total": 468
+}
+</pre>
+
+<h3 id="get/rune"><a target="_blank" href="https://indexer-testnet.runemine.com/rune?slug=testaaaaa">GET /rune</a></h3>
+
+Returns rune top-level details.
+
+<ul>
+  <li><code>slug</code> All lowercase, no spacer, name of the rune</li>
+  <li><code>id</code> Alternatively it's id in the `blockHeight:txIndex` format</li>
+</ul>
+
+<pre>
+{
+  "rune": {
+    "id": "2583756.37",
+    "tx": "5d00a3113b44cd837ab5498b96532ba619da66bf35e3059c89e6d38e503bf704",
+    "time": 1711507643,
+    "index": 7,
+    "cenotaph": "",
+    "slug": "testaaaaa",
+    "name": "TESTAAAAA",
+    "symbol": "T",
+    "divisibility": 0,
+    "turbo": false,
+    "premine": "1",
+    "mints": "0",
+    "amount": "0",
+    "cap": "0",
+    "start": 2583766,
+    "end": 2583766,
+    "heightStart": 0,
+    "heightEnd": 0,
+    "offsetStart": 90,
+    "offsetEnd": 10
+  }
+}
+</pre>
+
+<h3 id="get/balances"><a target="_blank" href="https://indexer-testnet.runemine.com/balances?rune=2583756.37">GET /balances</a></h3>
+
+Returns an address balances and associated runes details.
+
+<ul><li><code>address</code> Wallet address to fetch balances for</li></ul>
+
+<pre>
+{
+  "balances": [
+    {
+      "amount": "300000000000",
+      "rune": "2584333.39"
+    }
+  ],
+  "runes": [
+    {
+      "id": "2584333.39",
+      "tx": "2573fb505301bb4cfafff4f09cd5694efbf27e98b53befbdd43d12ad9232f945",
+      "time": 1711753002,
+      "index": 46,
+      "cenotaph": "",
+      "slug": "ineedtestrunes",
+      "name": "I•NEED•TEST•RUNES",
+      "symbol": "ᚱ",
+      "divisibility": 2,
+      "turbo": false,
+      "premine": "100000",
+      "mints": "92396",
+      "amount": "100000",
+      "cap": "20000000000000000",
+      "start": 2584333,
+      "end": 1000000000,
+      "heightStart": 0,
+      "heightEnd": 0,
+      "offsetStart": 0,
+      "offsetEnd": 0
+    }
+  }
+}
+</pre>
+
+<h3 id="get/holders"><a target="_blank" href="https://indexer-testnet.runemine.com/holders?rune=2584333.39">GET /holders</a></h3>
+
+Returns addresses balances (largest holder first) for a given rune.
+
+<ul><li><code>rune</code> Id in the `blockHeight:txIndex` format</li></ul>
+
+<pre>
+{
+  "holders": [
+    {
+      "address": "tb1pptjvqwkfujjpzq79esul99kpmxhhu2yfncw5k2uryq04rmm93euqpnh72f",
+      "amount": "3455600000"
+    },
+    {
+      "address": "tb1pfkrtgp87gk8s8c4knmhvtekkcs603g7tttc0ucefd6cqqwnxpxqs2haju6",
+      "amount": "1922600000"
+    },
+    {
+      "address": "tb1pppjl9jtcv5vcar268kwwael82dyfcrftdvk07462sw908rs38krqeqz4jr",
+      "amount": "230300000"
+    },
+  ],
+  "total": 2847
+}
+</pre>
+
+<h3 id="get/transfers"><a target="_blank" href="https://indexer-testnet.runemine.com/transfers?address=tb1pptjvqwkfujjpzq79esul99kpmxhhu2yfncw5k2uryq04rmm93euqpnh72f&limit=2">GET /transfers</a></h3>
+
+Returns paginated transfers filtered by rune, address, from or to.
+
+<ul>
+  <li><code>rune</code> Id in the `blockHeight:txIndex` format (optional)</li>
+  <li><code>from</code> Filter by from address (optional)</li>
+  <li><code>to</code> Filter by from address (optional)</li>
+  <li><code>address</code> Filter by from OR to address (optional)</li>
+  <li><code>offset</code> Number of runes to skip (for pagination)</li>
+  <li><code>limit</code> Maximum number of transfers to return</li>
+</ul>
+
+<pre>
+{
+  "total": 34748,
+  "transfers": [
+    {
+      "amount": "100000",
+      "from": "Mint",
+      "from_index": 0,
+      "id": "81C846BF-0330-AD02-5204-06AA8D477948",
+      "rune": "2584333.38",
+      "time": 1717533229,
+      "to": "tb1pptjvqwkfujjpzq79esul99kpmxhhu2yfncw5k2uryq04rmm93euqpnh72f",
+      "to_index": 0,
+      "tx": "fa2b5fd2890229680c567458c0c10138d723081829ea110ecf45643e142ef121"
+    },
+    {
+      "amount": "100000",
+      "from": "Mint",
+      "from_index": 0,
+      "id": "C349852C-73C3-A4A2-5EC0-F63C12413D6E",
+      "rune": "2584333.38",
+      "time": 1717533229,
+      "to": "tb1pptjvqwkfujjpzq79esul99kpmxhhu2yfncw5k2uryq04rmm93euqpnh72f",
+      "to_index": 0,
+      "tx": "a7505b5f5178977116f1b1e24954639bfe03ee30441c975c03120bdcf335ce24"
+    }
+  ]
+}
+</pre>
+
+<h3 id="get/utxos"><a target="_blank" href="https://indexer-testnet.runemine.com/utxos?address=tb1pptjvqwkfujjpzq79esul99kpmxhhu2yfncw5k2uryq04rmm93euqpnh72f">GET /utxos</a></h3>
+
+Returns addresses utxos with runes associated.
+
+<ul>
+  <li><code>address</code> Wallet address to fetch utxos for</li>
+  <li><code>unspent</code> When set to "true", only returns unspent utxos</li>
+</ul>
+
+<pre>
+{
+  "utxos": [
+    {
+      "id": "00039472fdd705432d0af79196ddb8503397a3dc97ac7d3dc8c6a7a9b137d42e:0",
+      "value": 546,
+      "address": "tb1pptjvqwkfujjpzq79esul99kpmxhhu2yfncw5k2uryq04rmm93euqpnh72f",
+      "balances": {
+        "2584333.39": "100000"
+      },
+      "spent": ""
+    },
+    {
+      "id": "00040e57ee14293d96c0a6009b85cad23a69ae228b43dc2baab01dd4b6fb7f2d:0",
+      "value": 546,
+      "address": "tb1pptjvqwkfujjpzq79esul99kpmxhhu2yfncw5k2uryq04rmm93euqpnh72f",
+      "balances": {
+        "2584333.39": "100000"
+      },
+      "spent": ""
+    }
+  ]
+}
+</pre>
+
+<h3 id="get/transaction"><a target="_blank" href="https://indexer-testnet.runemine.com/transaction?id=00040e57ee14293d96c0a6009b85cad23a69ae228b43dc2baab01dd4b6fb7f2d">GET /transaction</a></h3>
+
+Returns transaction details including inputs, outputs and parsed fields.
+
+<ul><li><code>id</code> Transaction id to fetch details for</li></ul>
+
+<pre>
+{
+  "edicts": [],
+  "fields": {
+    "20": [
+      "2584333",
+      "39"
+    ],
+    "22": [
+      "0"
+    ]
+  },
+  "runes": [],
+  "transaction": {
+    "id": "00040e57ee14293d96c0a6009b85cad23a69ae228b43dc2baab01dd4b6fb7f2d",
+    "index": 5312,
+    "block": 2818895,
+    "blockHash": "0000000000000007bdefa92f5354627036dbee0237f9c0d122ce8501e4f778d9",
+    "time": 1717099683,
+    "inputs": [
+      {
+        "t": "2432c774bb992332da7a31ee2b48fb6a67e73931d999edd0a15c6174046f9f93",
+        "i": 571,
+        "s": "",
+        "w": [
+          "b11356509fe6a842dc2da9e3d8961fe8f1aca4a7a8146072169a028ffbcf9754594f3bceae89217b3819743aebe6b4d8841dacd7bd03e8b47abd0ba8ae70fcb1"
+        ]
+      }
+    ],
+    "outputs": [
+      {
+        "i": 0,
+        "s": "51200ae4c03ac9e4a41103c5cc39f296c1d9af7e28899e1d4b2b83201f51ef658e78",
+        "a": "tb1pptjvqwkfujjpzq79esul99kpmxhhu2yfncw5k2uryq04rmm93euqpnh72f",
+        "v": 546
+      },
+      {
+        "i": 1,
+        "s": "6a5d09148dde9d0114271600",
+        "a": "",
+        "v": 0
+      }
+    ],
+    "cenotaph": "",
+    "indexed": true
+  },
+  "transfers": [
+    {
+      "id": "26B88DDB-F275-093D-8F9F-7FE9B5FFEAB8",
+      "tx": "00040e57ee14293d96c0a6009b85cad23a69ae228b43dc2baab01dd4b6fb7f2d",
+      "time": 1717099683,
+      "rune": "2584333.39",
+      "amount": "100000",
+      "from": "Mint",
+      "from_index": 0,
+      "to": "tb1pptjvqwkfujjpzq79esul99kpmxhhu2yfncw5k2uryq04rmm93euqpnh72f",
+      "to_index": 0
+    }
+  ]
+}
+</pre>
